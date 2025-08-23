@@ -52,12 +52,12 @@ struct CollectionViewRepresentable: UIViewRepresentable {
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) var context
-    @StateObject var viewModel: PhotoViewModel
+    @StateObject var viewModel: PhotoFRCViewModel
     @State private var isPickerPresented = false
     @State private var selectedItems: [PhotosPickerItem] = []
 
     init(context: NSManagedObjectContext) {
-        _viewModel = StateObject(wrappedValue: PhotoViewModel(context: context))
+        _viewModel = StateObject(wrappedValue: PhotoFRCViewModel(context: context))
     }
 
     let columns = [
