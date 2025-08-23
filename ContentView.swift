@@ -69,6 +69,7 @@ class PhotoFRCController: NSObject, ObservableObject, NSFetchedResultsController
 class PhotoCollectionViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     private var collectionView: UICollectionView!
     var viewModel: PhotoFRCController!
+    var onSelectPhoto: ((Photo) -> Void)? // ← 追加
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -91,6 +92,14 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
         viewModel.attach(collectionView: collectionView)
     }
 
+    // MARK: - UICollectionViewDelegate
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if let photo = viewModel.photo(at: indexPath.item) {
+            onSelectPhoto?(photo) // SwiftUI に通知
+        }
+    }
+
+    // MARK: - DataSource
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         viewModel.numberOfItems
     }
@@ -99,7 +108,6 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)
         cell.backgroundColor = .lightGray
 
-        // 画像を追加
         if let photo = viewModel.photo(at: indexPath.item),
            let data = photo.imageData,
            let uiImage = UIImage(data: data) {
@@ -117,10 +125,12 @@ class PhotoCollectionViewController: UIViewController, UICollectionViewDataSourc
 
 struct PhotoCollectionViewRepresentable: UIViewControllerRepresentable {
     @ObservedObject var viewModel: PhotoFRCController
+    var onSelectPhoto: ((Photo) -> Void)? // ← SwiftUI 側に渡す
 
     func makeUIViewController(context: Context) -> PhotoCollectionViewController {
         let vc = PhotoCollectionViewController()
         vc.viewModel = viewModel
+        vc.onSelectPhoto = onSelectPhoto
         return vc
     }
 
@@ -136,26 +146,23 @@ struct ContentView: View {
         _viewModel = StateObject(wrappedValue: PhotoFRCController(context: context))
     }
 
+    @State private var selectedPhoto: Photo? = nil
+    @State private var showDetail = false
+
     var body: some View {
         NavigationView {
-            PhotoCollectionViewRepresentable(viewModel: viewModel)
-                .navigationTitle("Photos")
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(action: {
-                            // テスト用: ランダム色画像を追加
-                            let size = CGSize(width: 100, height: 100)
-                            UIGraphicsBeginImageContext(size)
-                            UIColor.random.setFill()
-                            UIRectFill(CGRect(origin: .zero, size: size))
-                            let image = UIGraphicsGetImageFromCurrentImageContext()!
-                            UIGraphicsEndImageContext()
-                            viewModel.addPhoto(image)
-                        }) {
-                            Image(systemName: "plus")
-                        }
-                    }
+            PhotoCollectionViewRepresentable(viewModel: viewModel) { photo in
+                selectedPhoto = photo
+                showDetail = true
+            }
+            .navigationTitle("Photos")
+            .sheet(isPresented: $showDetail) {
+                if let uiImage = selectedPhoto?.imageData.flatMap({ UIImage(data: $0) }) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFit()
                 }
+            }
         }
     }
 }
