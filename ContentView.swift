@@ -10,108 +10,162 @@ import PhotosUI
 import SwiftUI
 import CoreData
 
-struct CollectionViewRepresentable: UIViewRepresentable {
-    
-    func makeUIView(context: Context) -> UICollectionView {
+class PhotoFRCController: NSObject, ObservableObject, NSFetchedResultsControllerDelegate {
+    private let frc: NSFetchedResultsController<Photo>
+    private weak var collectionView: UICollectionView?
+
+    init(context: NSManagedObjectContext) {
+        let request: NSFetchRequest<Photo> = Photo.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \Photo.creationDate, ascending: true)]
+        request.fetchBatchSize = 20
+
+        frc = NSFetchedResultsController(fetchRequest: request,
+                                         managedObjectContext: context,
+                                         sectionNameKeyPath: nil,
+                                         cacheName: nil)
+
+        super.init()
+        frc.delegate = self
+
+        do {
+            try frc.performFetch()
+        } catch {
+            print("Fetch failed: \(error)")
+        }
+    }
+
+    var numberOfItems: Int {
+        frc.fetchedObjects?.count ?? 0
+    }
+
+    func photo(at index: Int) -> Photo? {
+        frc.fetchedObjects?[index]
+    }
+
+    func attach(collectionView: UICollectionView) {
+        self.collectionView = collectionView
+    }
+
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        DispatchQueue.main.async {
+            self.collectionView?.reloadData()
+        }
+    }
+
+    func addPhoto(_ uiImage: UIImage) {
+        let context = frc.managedObjectContext
+        let newPhoto = Photo(context: context)
+        newPhoto.id = UUID()
+        newPhoto.creationDate = Date()
+        newPhoto.imageData = uiImage.jpegData(compressionQuality: 0.8)
+        do {
+            try context.save()
+        } catch {
+            print("Save failed: \(error)")
+        }
+    }
+}
+
+class PhotoCollectionViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    private var collectionView: UICollectionView!
+    var viewModel: PhotoFRCController!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .white
+
         let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .horizontal // LazyHGrid の横スクロールに合わせる
+        layout.scrollDirection = .vertical
         layout.itemSize = CGSize(width: 100, height: 100)
-        
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = .clear
+        layout.minimumInteritemSpacing = 10
+        layout.minimumLineSpacing = 10
+
+        collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: layout)
+        collectionView.backgroundColor = .white
+        collectionView.dataSource = self
+        collectionView.delegate = self
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "Cell")
-        
-        collectionView.dataSource = context.coordinator
-        collectionView.delegate = context.coordinator
-        
-        return collectionView
+        collectionView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        view.addSubview(collectionView)
+
+        viewModel.attach(collectionView: collectionView)
     }
-    
-    func updateUIView(_ uiView: UICollectionView, context: Context) {
-        uiView.reloadData()
+
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        viewModel.numberOfItems
     }
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator()
-    }
-    
-    class Coordinator: NSObject, UICollectionViewDataSource, UICollectionViewDelegate {
-        let items = Array(0..<10)
-        
-        func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-            return items.count
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)
+        cell.backgroundColor = .lightGray
+
+        // 画像を追加
+        if let photo = viewModel.photo(at: indexPath.item),
+           let data = photo.imageData,
+           let uiImage = UIImage(data: data) {
+            let imageView = UIImageView(image: uiImage)
+            imageView.contentMode = .scaleAspectFill
+            imageView.clipsToBounds = true
+            imageView.frame = cell.contentView.bounds
+            imageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            cell.contentView.subviews.forEach { $0.removeFromSuperview() }
+            cell.contentView.addSubview(imageView)
         }
-        
-        func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)
-            cell.backgroundColor = .blue
-            return cell
-        }
+        return cell
     }
+}
+
+struct PhotoCollectionViewRepresentable: UIViewControllerRepresentable {
+    @ObservedObject var viewModel: PhotoFRCController
+
+    func makeUIViewController(context: Context) -> PhotoCollectionViewController {
+        let vc = PhotoCollectionViewController()
+        vc.viewModel = viewModel
+        return vc
+    }
+
+    func updateUIViewController(_ uiViewController: PhotoCollectionViewController, context: Context) {}
 }
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) var context
-    @StateObject var viewModel: PhotoFRCViewModel
-    @State private var isPickerPresented = false
-    @State private var selectedItems: [PhotosPickerItem] = []
+    @StateObject var viewModel: PhotoFRCController
 
-    init(context: NSManagedObjectContext) {
-        _viewModel = StateObject(wrappedValue: PhotoFRCViewModel(context: context))
+    init() {
+        let context = PersistenceController.shared.container.viewContext
+        _viewModel = StateObject(wrappedValue: PhotoFRCController(context: context))
     }
-
-    let columns = [
-        GridItem(.fixed(120)),
-        GridItem(.fixed(120)),
-        GridItem(.fixed(120))
-    ]
 
     var body: some View {
         NavigationView {
-            ScrollView {
-                LazyVGrid(columns: columns, spacing: 10) {
-                    ForEach(viewModel.photos, id: \.id) { photo in
-                        if let data = photo.imageData, let uiImage = UIImage(data: data) {
-                            Image(uiImage: uiImage)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 120, height: 120)
-                                .clipped()
-                                .cornerRadius(8)
+            PhotoCollectionViewRepresentable(viewModel: viewModel)
+                .navigationTitle("Photos")
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: {
+                            // テスト用: ランダム色画像を追加
+                            let size = CGSize(width: 100, height: 100)
+                            UIGraphicsBeginImageContext(size)
+                            UIColor.random.setFill()
+                            UIRectFill(CGRect(origin: .zero, size: size))
+                            let image = UIGraphicsGetImageFromCurrentImageContext()!
+                            UIGraphicsEndImageContext()
+                            viewModel.addPhoto(image)
+                        }) {
+                            Image(systemName: "plus")
                         }
                     }
                 }
-                .padding()
-            }
-            .navigationTitle("Photos")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        isPickerPresented = true
-                    }) {
-                        Image(systemName: "plus") // + ボタン
-                    }
-                }
-            }
-            .photosPicker(isPresented: $isPickerPresented, selection: $selectedItems, matching: .images)
-            .onChange(of: selectedItems) { newItems in
-                for item in newItems {
-                    item.loadTransferable(type: Data.self) { result in
-                        switch result {
-                        case .success(let data?):
-                            if let uiImage = UIImage(data: data) {
-                                DispatchQueue.main.async {
-                                    viewModel.addPhoto(uiImage)
-                                }
-                            }
-                        case .success(nil):
-                            break
-                        case .failure(let error):
-                            print("Picker error: \(error)")
-                        }
-                    }
-                }
-            }
         }
     }
 }
+
+extension UIColor {
+    static var random: UIColor {
+        UIColor(red: .random(in: 0...1),
+                green: .random(in: 0...1),
+                blue: .random(in: 0...1),
+                alpha: 1)
+    }
+}
+
