@@ -8,7 +8,7 @@
 import UIKit
 import PhotosUI
 import SwiftUI
-import UIKit
+import CoreData
 
 struct CollectionViewRepresentable: UIViewRepresentable {
     
@@ -51,19 +51,67 @@ struct CollectionViewRepresentable: UIViewRepresentable {
 }
 
 struct ContentView: View {
-    let rows = [GridItem(.fixed(120))] // LazyHGrid の行サイズ
+    @Environment(\.managedObjectContext) var context
+    @StateObject var viewModel: PhotoViewModel
+    @State private var isPickerPresented = false
+    @State private var selectedItems: [PhotosPickerItem] = []
+
+    init(context: NSManagedObjectContext) {
+        _viewModel = StateObject(wrappedValue: PhotoViewModel(context: context))
+    }
+
+    let columns = [
+        GridItem(.fixed(120)),
+        GridItem(.fixed(120)),
+        GridItem(.fixed(120))
+    ]
 
     var body: some View {
-        ScrollView(.horizontal) {
-            LazyHGrid(rows: rows, spacing: 10) {
-                ForEach(0..<5) { _ in
-                    CollectionViewRepresentable()
-                        .frame(width: 120, height: 120) // 表示サイズ必須
-                        .cornerRadius(8)
-                        .shadow(radius: 2)
+        NavigationView {
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: 10) {
+                    ForEach(viewModel.photos, id: \.id) { photo in
+                        if let data = photo.imageData, let uiImage = UIImage(data: data) {
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 120, height: 120)
+                                .clipped()
+                                .cornerRadius(8)
+                        }
+                    }
+                }
+                .padding()
+            }
+            .navigationTitle("Photos")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        isPickerPresented = true
+                    }) {
+                        Image(systemName: "plus") // + ボタン
+                    }
                 }
             }
-            .padding()
+            .photosPicker(isPresented: $isPickerPresented, selection: $selectedItems, matching: .images)
+            .onChange(of: selectedItems) { newItems in
+                for item in newItems {
+                    item.loadTransferable(type: Data.self) { result in
+                        switch result {
+                        case .success(let data?):
+                            if let uiImage = UIImage(data: data) {
+                                DispatchQueue.main.async {
+                                    viewModel.addPhoto(uiImage)
+                                }
+                            }
+                        case .success(nil):
+                            break
+                        case .failure(let error):
+                            print("Picker error: \(error)")
+                        }
+                    }
+                }
+            }
         }
     }
 }

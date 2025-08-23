@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		186ED8C42E59DCE3001965AC /* PhotoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186ED8C32E59DCE3001965AC /* PhotoViewModel.swift */; };
 		188448B72E59C0C6008AC1A0 /* UICollectionViewInSwiftUI_2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188448B62E59C0C6008AC1A0 /* UICollectionViewInSwiftUI_2App.swift */; };
 		188448BE2E59C0C6008AC1A0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188448BD2E59C0C6008AC1A0 /* ContentView.swift */; };
 /* End PBXBuildFile section */
@@ -29,6 +30,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		186ED8C32E59DCE3001965AC /* PhotoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoViewModel.swift; sourceTree = "<group>"; };
 		188448B32E59C0C6008AC1A0 /* UICollectionViewInSwiftUI_2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UICollectionViewInSwiftUI_2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		188448B62E59C0C6008AC1A0 /* UICollectionViewInSwiftUI_2App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UICollectionViewInSwiftUI_2App.swift; sourceTree = "<group>"; };
 		188448BD2E59C0C6008AC1A0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -87,6 +89,7 @@
 				188448D62E59C0C7008AC1A0 /* UICollectionViewInSwiftUI_2UITests */,
 				188448B42E59C0C6008AC1A0 /* Products */,
 				188448BD2E59C0C6008AC1A0 /* ContentView.swift */,
+				186ED8C32E59DCE3001965AC /* PhotoViewModel.swift */,
 				188448B62E59C0C6008AC1A0 /* UICollectionViewInSwiftUI_2App.swift */,
 			);
 			sourceTree = "<group>";
@@ -247,6 +250,7 @@
 			files = (
 				188448B72E59C0C6008AC1A0 /* UICollectionViewInSwiftUI_2App.swift in Sources */,
 				188448BE2E59C0C6008AC1A0 /* ContentView.swift in Sources */,
+				186ED8C42E59DCE3001965AC /* PhotoViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -417,7 +421,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 16;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
@@ -456,7 +460,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 16;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;

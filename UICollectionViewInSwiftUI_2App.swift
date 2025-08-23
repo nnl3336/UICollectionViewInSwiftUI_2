@@ -31,9 +31,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 @main
 struct MyApp: App {
+    let persistenceController = PersistenceController.shared
+
     var body: some Scene {
         WindowGroup {
-            ContentView() // ここで LazyHGrid + UICollectionView を表示
+            ContentView(context: persistenceController.container.viewContext)
+                .environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
     }
 }
