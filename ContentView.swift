@@ -161,7 +161,7 @@ class PhotoCollectionViewController: UIViewController,
            let uiImage = UIImage(data: data) {
             cell.imageView.image = uiImage
         }
-        return cell 
+        return cell
     }
 
     // MARK: - Public API
@@ -241,17 +241,17 @@ struct ContentView: View {
     @StateObject var viewModel = PhotoFRCController(context: PersistenceController.shared.container.viewContext)
     @State private var selectedPhoto: Photo?
     @State private var selectedPhotos: [Photo] = []
-
+    
     var body: some View {
         VStack {
             PhotoCollectionViewRepresentable(viewModel: viewModel,
                                              onSelectPhoto: { photo in
-                                                 selectedPhoto = photo
-                                             },
+                selectedPhoto = photo
+            },
                                              onSelectMultiple: { photos in
-                                                 selectedPhotos = photos
-                                             })
-
+                selectedPhotos = photos
+            })
+            
             if let photo = selectedPhoto,
                let data = photo.imageData,
                let uiImage = UIImage(data: data) {
@@ -260,12 +260,12 @@ struct ContentView: View {
                     .scaledToFit()
                     .frame(height: 200)
             }
-
+            
             if !selectedPhotos.isEmpty {
                 Text("\(selectedPhotos.count) 枚選択中")
                     .font(.headline)
                     .foregroundColor(.blue)
-
+                
                 Button("選択解除") {
                     // PhotoCollectionViewController に公開している API を呼ぶ
                     if let controller = findController() {
@@ -277,7 +277,7 @@ struct ContentView: View {
             }
         }
     }
-
+    
     // Representable から UIViewController を引っ張り出すヘルパー
     private func findController() -> PhotoCollectionViewController? {
         UIApplication.shared.connectedScenes
@@ -286,7 +286,7 @@ struct ContentView: View {
             .compactMap { $0 as? PhotoCollectionViewController }
             .first
     }
-
+    
     private func getAllChildren(_ vc: UIViewController) -> [UIViewController] {
         return [vc] + vc.children.flatMap { getAllChildren($0) }
     }
