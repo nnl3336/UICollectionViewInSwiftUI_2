@@ -161,7 +161,7 @@ class PhotoCollectionViewController: UIViewController,
            let uiImage = UIImage(data: data) {
             cell.imageView.image = uiImage
         }
-        return cell
+        return cell 
     }
 
     // MARK: - Public API
