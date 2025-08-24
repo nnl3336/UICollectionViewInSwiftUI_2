@@ -10,6 +10,8 @@
 		186ED8C42E59DCE3001965AC /* PhotoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186ED8C32E59DCE3001965AC /* PhotoViewModel.swift */; };
 		188448B72E59C0C6008AC1A0 /* UICollectionViewInSwiftUI_2App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188448B62E59C0C6008AC1A0 /* UICollectionViewInSwiftUI_2App.swift */; };
 		188448BE2E59C0C6008AC1A0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188448BD2E59C0C6008AC1A0 /* ContentView.swift */; };
+		18F28C9A2E5ABB0C00128A87 /* PhotoFRCController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F28C992E5ABB0C00128A87 /* PhotoFRCController.swift */; };
+		18F28C9C2E5ABB4700128A87 /* PhotoCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F28C9B2E5ABB4700128A87 /* PhotoCollectionViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +38,8 @@
 		188448BD2E59C0C6008AC1A0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		188448C92E59C0C7008AC1A0 /* UICollectionViewInSwiftUI_2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UICollectionViewInSwiftUI_2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		188448D32E59C0C7008AC1A0 /* UICollectionViewInSwiftUI_2UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UICollectionViewInSwiftUI_2UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		18F28C992E5ABB0C00128A87 /* PhotoFRCController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoFRCController.swift; sourceTree = "<group>"; };
+		18F28C9B2E5ABB4700128A87 /* PhotoCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCollectionViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -89,6 +93,8 @@
 				188448D62E59C0C7008AC1A0 /* UICollectionViewInSwiftUI_2UITests */,
 				188448B42E59C0C6008AC1A0 /* Products */,
 				188448BD2E59C0C6008AC1A0 /* ContentView.swift */,
+				18F28C992E5ABB0C00128A87 /* PhotoFRCController.swift */,
+				18F28C9B2E5ABB4700128A87 /* PhotoCollectionViewController.swift */,
 				186ED8C32E59DCE3001965AC /* PhotoViewModel.swift */,
 				188448B62E59C0C6008AC1A0 /* UICollectionViewInSwiftUI_2App.swift */,
 			);
@@ -249,6 +255,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				188448B72E59C0C6008AC1A0 /* UICollectionViewInSwiftUI_2App.swift in Sources */,
+				18F28C9C2E5ABB4700128A87 /* PhotoCollectionViewController.swift in Sources */,
+				18F28C9A2E5ABB0C00128A87 /* PhotoFRCController.swift in Sources */,
 				188448BE2E59C0C6008AC1A0 /* ContentView.swift in Sources */,
 				186ED8C42E59DCE3001965AC /* PhotoViewModel.swift in Sources */,
 			);
